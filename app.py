@@ -1,155 +1,126 @@
 import streamlit as st
 
-# ===============================
-# PAGE CONFIG
-# ===============================
+# ------------------ PAGE CONFIG ------------------
 st.set_page_config(
-    page_title="PRAGYAN AI • School Intelligence",
-    page_icon="🛰️",
+    page_title="PRAGYAN AI • School Assistant",
+    page_icon="🤖",
     layout="wide"
 )
 
-# ===============================
-# SCI-FI CSS
-# ===============================
+# ------------------ CUSTOM CSS ------------------
 st.markdown("""
 <style>
-.stApp {
-    background: radial-gradient(circle at top, #020617, #000000);
-    color: #e5e7eb;
-    font-family: 'Orbitron', sans-serif;
+body {
+    background: radial-gradient(circle at top, #050b18, #000000);
+    color: #e6f1ff;
 }
-
-h1 {
-    text-align: center;
-    color: #38bdf8;
-    text-shadow: 0 0 20px #38bdf8;
-    letter-spacing: 4px;
+.chat-box {
+    background: linear-gradient(145deg, #050b18, #020617);
+    border: 1px solid #00eaff;
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 0 12px rgba(0,234,255,0.15);
 }
-
-.stChatMessage {
-    background: rgba(2, 6, 23, 0.85);
-    border: 1px solid rgba(56,189,248,0.4);
-    border-radius: 18px;
-    padding: 22px;
-    box-shadow: 0 0 25px rgba(56,189,248,0.25);
+.user {
+    border-left: 5px solid #ff4b4b;
 }
-
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #020617, #020617);
-    border-right: 2px solid #38bdf8;
+.bot {
+    border-left: 5px solid #00eaff;
 }
-
-.badge {
-    display:inline-block;
-    padding:6px 16px;
-    border-radius:50px;
-    border:1px solid #38bdf8;
-    color:#38bdf8;
-    margin:4px;
-    font-size:12px;
-    box-shadow:0 0 10px rgba(56,189,248,0.6);
+.sidebar-box {
+    background: #020617;
+    border: 1px solid #00eaff;
+    padding: 15px;
+    border-radius: 12px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ===============================
-# SIDEBAR (COMMAND PANEL)
-# ===============================
+# ------------------ SIDEBAR (SCI-FI POPUP) ------------------
 with st.sidebar:
-    st.markdown("## 🛰️ AI COMMAND CORE")
-    st.markdown("**Status:** 🟢 ONLINE")
-    st.markdown("**Security:** 🔐 End-to-End Encrypted")
-    st.markdown("**Network:** 🛰️ Satellite Linked")
-    st.markdown("**Mode:** 🎓 School Intelligence")
-    st.divider()
-    st.markdown("📞 **Human Support**")
-    st.markdown("**Office:** 7300723901")
-    st.caption("© PRAGYAN AI SYSTEM")
+    st.markdown("<div class='sidebar-box'>", unsafe_allow_html=True)
+    st.markdown("### 🛰 PRAGYAN AI CORE")
+    st.markdown("""
+    - 🔐 End-to-End Encrypted  
+    - 🧠 Domain-Locked Intelligence  
+    - ⚡ Real-Time Responses  
+    - ☎ Human Escalation Ready  
+    """)
+    st.markdown("📞 **School Office:** +91-XXXXXXXXXX")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# ===============================
-# HEADER
-# ===============================
-st.markdown("<h1>PRAGYAN AI</h1>", unsafe_allow_html=True)
-st.markdown("""
-<div class="badge">INSTITUTIONAL AI</div>
-<div class="badge">REAL-TIME RESPONSE</div>
-<div class="badge">DOMAIN-LOCKED</div>
-<div class="badge">SCI-FI INTERFACE</div>
-""", unsafe_allow_html=True)
+# ------------------ DATA ------------------
+FAQ_DATA = {
+    "school timing": "School usually starts at **8:00 AM** and ends at **2:00 PM**. Timings may vary on special days.",
+    "bell schedule": "The bell schedule includes period-wise classes, short breaks, and a lunch break. Please confirm from the notice board for today.",
+    "lunch menu": "The weekly lunch menu is shared by the school office or displayed on the notice board.",
+    "holiday": "School holidays follow the official academic calendar issued by the school.",
+    "absence": "Parents should inform the school office through a written note or phone call for any absence or late arrival.",
+    "early pickup": "For early pickup, parents must submit a request at the school office with valid identification.",
+    "lost and found": "The Lost & Found section is located near the school office.",
+    "dress code": "The school follows a prescribed uniform and dress code as per school guidelines.",
+    "summer": "The school remains closed during summer vacations except for notified activities.",
+    "library": "Library hours are generally during school hours and as per class schedule.",
+    "admission": "Admissions are handled by the school office. Application forms and guidelines are available there.",
+    "documents": "Required documents include birth certificate, previous report card, transfer certificate, and ID proof.",
+    "fees": "Fee structure varies by class. Please contact the school office for exact details.",
+    "scholarship": "Scholarships or fee concessions are offered as per school policy.",
+    "bus": "School bus registration is available through the transport office.",
+    "visitor": "All visitors must register at the school gate and carry valid ID.",
+    "nurse": "The school nurse is available during school hours for medical assistance.",
+    "bullying": "The school follows a strict anti-bullying policy to ensure student safety.",
+    "calendar": "The academic calendar is available from the school office or official communication.",
+    "portal": "Parents can access student information through the official school portal.",
+    "contact teacher": "Teachers can be contacted via official school communication channels."
+}
 
-# ===============================
-# SESSION STATE
-# ===============================
+OFFICE_CONTACT = "📞 School Office: +91-XXXXXXXXXX"
+
+# ------------------ SESSION STATE ------------------
 if "chat" not in st.session_state:
     st.session_state.chat = []
 
-if "fail" not in st.session_state:
-    st.session_state.fail = 0
+if "fail_count" not in st.session_state:
+    st.session_state.fail_count = 0
 
-# ===============================
-# FAQ DATA
-# ===============================
-FAQ = {
-    "time": "School operates during official academic hours as notified.",
-    "bell": "Bell schedule is displayed on the school notice board.",
-    "lunch": "Lunch menu is shared weekly by the school.",
-    "holiday": "Please refer to the official school calendar.",
-    "absence": "Parents must inform the school for absence or late arrival.",
-    "pickup": "Early pickup requires prior permission.",
-    "lost": "Lost and Found is available inside the campus.",
-    "dress": "Students must strictly follow the uniform policy.",
-    "summer": "School remains closed during summer vacation.",
-    "library": "Library timings are announced by the administration.",
+# ------------------ CHAT TITLE ------------------
+st.markdown("## 🤖 PRAGYAN AI – School Information Assistant")
+st.markdown("Ask about timings, fees, admissions, transport, rules, academics, and more.")
 
-    "admission": "Admissions are processed through the school office.",
-    "documents": "Documents include birth certificate and school records.",
-    "fee": "Fee structure is available at the school office.",
-    "scholarship": "Scholarship details are provided by the administration.",
+# ------------------ DISPLAY CHAT ------------------
+for role, msg in st.session_state.chat:
+    css_class = "user" if role == "user" else "bot"
+    st.markdown(f"<div class='chat-box {css_class}'>{msg}</div>", unsafe_allow_html=True)
 
-    "bus": "School transport is available upon registration.",
-    "late": "Contact the transport office if the bus is delayed.",
-    "visitor": "All visitors must register at the entry gate.",
-    "bullying": "The school follows a zero-tolerance anti-bullying policy.",
+# ------------------ USER INPUT ------------------
+user_input = st.text_input("💬 Ask your question here:")
 
-    "calendar": "School calendar is officially published.",
-    "teacher": "Teachers can be contacted via official channels.",
-    "exam": "Students appear in school and board examinations.",
-    "report": "Report cards are released as per schedule.",
-    "transcript": "Transcripts can be requested from the school office."
-}
+# ------------------ RESPONSE LOGIC ------------------
+def get_answer(query):
+    query = query.lower()
+    for key in FAQ_DATA:
+        if key in query:
+            return FAQ_DATA[key]
+    return None
 
-# ===============================
-# RESPONSE ENGINE
-# ===============================
-def respond(q):
-    q = q.lower()
-    for k in FAQ:
-        if k in q:
-            st.session_state.fail = 0
-            return FAQ[k]
+if user_input:
+    st.session_state.chat.append(("user", user_input))
+    answer = get_answer(user_input)
 
-    st.session_state.fail += 1
-    if st.session_state.fail >= 2:
-        return "🤝 **Talk to a Human**\n\n📞 School Office: **7300723901**"
+    if answer:
+        st.session_state.chat.append(("bot", answer))
+        st.session_state.fail_count = 0
+    else:
+        st.session_state.fail_count += 1
+        if st.session_state.fail_count >= 2:
+            st.session_state.chat.append(
+                ("bot", f"I’m unable to answer this accurately. Please contact a human representative.\n\n{OFFICE_CONTACT}")
+            )
+            st.session_state.fail_count = 0
+        else:
+            st.session_state.chat.append(
+                ("bot", "I’m not completely sure about that. Could you please rephrase your question?")
+            )
 
-    return "⚠️ Query not recognized. Please rephrase."
-
-# ===============================
-# CHAT HISTORY
-# ===============================
-for r, m in st.session_state.chat:
-    with st.chat_message(r):
-        st.markdown(m)
-
-# ===============================
-# INPUT
-# ===============================
-user = st.chat_input("🔍 Ask School Intelligence Query...")
-
-if user:
-    st.session_state.chat.append(("user", user))
-    ans = respond(user)
-    st.session_state.chat.append(("assistant", ans))
-    with st.chat_message("assistant"):
-        st.markdown(ans)
+    st.experimental_rerun()
