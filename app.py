@@ -1,126 +1,97 @@
 import streamlit as st
 
-# ------------------ PAGE CONFIG ------------------
 st.set_page_config(
     page_title="PRAGYAN AI • School Assistant",
     page_icon="🤖",
     layout="wide"
 )
 
-# ------------------ CUSTOM CSS ------------------
+# ------------------ SCI-FI UI ------------------
 st.markdown("""
 <style>
-body {
-    background: radial-gradient(circle at top, #050b18, #000000);
-    color: #e6f1ff;
-}
-.chat-box {
-    background: linear-gradient(145deg, #050b18, #020617);
-    border: 1px solid #00eaff;
-    border-radius: 14px;
-    padding: 14px;
-    margin-bottom: 10px;
-    box-shadow: 0 0 12px rgba(0,234,255,0.15);
-}
-.user {
-    border-left: 5px solid #ff4b4b;
-}
-.bot {
-    border-left: 5px solid #00eaff;
-}
-.sidebar-box {
-    background: #020617;
-    border: 1px solid #00eaff;
-    padding: 15px;
-    border-radius: 12px;
-}
+body { background: #020617; color:#e6f1ff; }
+.chat { border:1px solid #00eaff; border-radius:14px; padding:14px; margin:8px 0; }
+.user { border-left:5px solid #ff4b4b; }
+.bot { border-left:5px solid #00eaff; }
+.sidebar-box { border:1px solid #00eaff; padding:15px; border-radius:12px; }
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------ SIDEBAR (SCI-FI POPUP) ------------------
+# ------------------ SIDEBAR ------------------
 with st.sidebar:
     st.markdown("<div class='sidebar-box'>", unsafe_allow_html=True)
-    st.markdown("### 🛰 PRAGYAN AI CORE")
+    st.markdown("### 🛰 PRAGYAN AI SYSTEM")
     st.markdown("""
-    - 🔐 End-to-End Encrypted  
-    - 🧠 Domain-Locked Intelligence  
-    - ⚡ Real-Time Responses  
-    - ☎ Human Escalation Ready  
+    • Institutional AI  
+    • Domain Locked  
+    • Secure Communication  
+    • Human Escalation Enabled  
     """)
     st.markdown("📞 **School Office:** +91-XXXXXXXXXX")
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ------------------ DATA ------------------
-FAQ_DATA = {
-    "school timing": "School usually starts at **8:00 AM** and ends at **2:00 PM**. Timings may vary on special days.",
-    "bell schedule": "The bell schedule includes period-wise classes, short breaks, and a lunch break. Please confirm from the notice board for today.",
-    "lunch menu": "The weekly lunch menu is shared by the school office or displayed on the notice board.",
-    "holiday": "School holidays follow the official academic calendar issued by the school.",
-    "absence": "Parents should inform the school office through a written note or phone call for any absence or late arrival.",
-    "early pickup": "For early pickup, parents must submit a request at the school office with valid identification.",
-    "lost and found": "The Lost & Found section is located near the school office.",
-    "dress code": "The school follows a prescribed uniform and dress code as per school guidelines.",
-    "summer": "The school remains closed during summer vacations except for notified activities.",
-    "library": "Library hours are generally during school hours and as per class schedule.",
-    "admission": "Admissions are handled by the school office. Application forms and guidelines are available there.",
-    "documents": "Required documents include birth certificate, previous report card, transfer certificate, and ID proof.",
-    "fees": "Fee structure varies by class. Please contact the school office for exact details.",
-    "scholarship": "Scholarships or fee concessions are offered as per school policy.",
-    "bus": "School bus registration is available through the transport office.",
-    "visitor": "All visitors must register at the school gate and carry valid ID.",
-    "nurse": "The school nurse is available during school hours for medical assistance.",
-    "bullying": "The school follows a strict anti-bullying policy to ensure student safety.",
-    "calendar": "The academic calendar is available from the school office or official communication.",
-    "portal": "Parents can access student information through the official school portal.",
-    "contact teacher": "Teachers can be contacted via official school communication channels."
+# ------------------ FAQ ANSWERS (HUMAN-LIKE) ------------------
+ANSWERS = {
+    "start": "The school day usually begins at **8:00 AM** with morning assembly and ends around **2:00 PM**. Timings may vary slightly for different classes.",
+    "end": "The school day generally concludes by **2:00 PM**, after completion of all academic periods.",
+    "bell": "The regular bell schedule includes morning assembly, subject periods of around 40 minutes, a lunch break in the middle of the day, and dispersal in the afternoon.",
+    "lunch": "The weekly lunch menu is planned by the school and shared through circulars or the notice board. Students may also bring home-packed meals.",
+    "holiday": "School holidays follow the official academic calendar. If today is a holiday, students are informed in advance through notice or circular.",
+    "absence": "To report an absence, parents should inform the class teacher or school office through a written note or phone call.",
+    "early pickup": "For early pickup, parents must submit a request at the school office and show valid identification.",
+    "lost": "The Lost and Found section is usually maintained near the school office where students can check for misplaced items.",
+    "uniform": "The school follows a strict uniform and dress code policy. Students are expected to wear the prescribed uniform on all working days.",
+    "library": "The school library is open during school hours and students can visit as per their class schedule or teacher’s permission.",
+    "admission": "Admissions are processed by the school office. Application forms and guidance are provided during the admission period.",
+    "fees": "The fee structure varies by class and includes tuition and other charges. Parents are advised to contact the school office for exact details.",
+    "bus": "School transport is available on selected routes. Registration is done through the transport office.",
+    "nurse": "A trained school nurse is available during school hours to handle minor injuries and health concerns.",
+    "bullying": "The school follows a zero-tolerance anti-bullying policy to ensure a safe and respectful environment.",
+    "calendar": "The academic calendar is issued by the school at the start of the session and shared with parents.",
+    "teacher": "Parents can contact teachers through official school communication channels or during parent-teacher meetings."
 }
 
-OFFICE_CONTACT = "📞 School Office: +91-XXXXXXXXXX"
-
-# ------------------ SESSION STATE ------------------
+# ------------------ SESSION ------------------
 if "chat" not in st.session_state:
     st.session_state.chat = []
 
-if "fail_count" not in st.session_state:
-    st.session_state.fail_count = 0
+if "fail" not in st.session_state:
+    st.session_state.fail = 0
 
-# ------------------ CHAT TITLE ------------------
-st.markdown("## 🤖 PRAGYAN AI – School Information Assistant")
-st.markdown("Ask about timings, fees, admissions, transport, rules, academics, and more.")
+# ------------------ DISPLAY ------------------
+st.markdown("## 🤖 PRAGYAN AI – School Assistant")
 
-# ------------------ DISPLAY CHAT ------------------
 for role, msg in st.session_state.chat:
-    css_class = "user" if role == "user" else "bot"
-    st.markdown(f"<div class='chat-box {css_class}'>{msg}</div>", unsafe_allow_html=True)
+    cls = "user" if role == "user" else "bot"
+    st.markdown(f"<div class='chat {cls}'>{msg}</div>", unsafe_allow_html=True)
 
-# ------------------ USER INPUT ------------------
-user_input = st.text_input("💬 Ask your question here:")
+# ------------------ INPUT ------------------
+query = st.text_input("Ask your question:")
 
-# ------------------ RESPONSE LOGIC ------------------
-def get_answer(query):
-    query = query.lower()
-    for key in FAQ_DATA:
-        if key in query:
-            return FAQ_DATA[key]
+def intelligent_reply(q):
+    q = q.lower()
+    for k in ANSWERS:
+        if k in q:
+            return ANSWERS[k]
     return None
 
-if user_input:
-    st.session_state.chat.append(("user", user_input))
-    answer = get_answer(user_input)
+if query:
+    st.session_state.chat.append(("user", query))
+    reply = intelligent_reply(query)
 
-    if answer:
-        st.session_state.chat.append(("bot", answer))
-        st.session_state.fail_count = 0
+    if reply:
+        st.session_state.chat.append(("bot", reply))
+        st.session_state.fail = 0
     else:
-        st.session_state.fail_count += 1
-        if st.session_state.fail_count >= 2:
+        st.session_state.fail += 1
+        if st.session_state.fail >= 2:
             st.session_state.chat.append(
-                ("bot", f"I’m unable to answer this accurately. Please contact a human representative.\n\n{OFFICE_CONTACT}")
+                ("bot", "I’m unable to answer this accurately. Please contact the school office at +91-XXXXXXXXXX.")
             )
-            st.session_state.fail_count = 0
+            st.session_state.fail = 0
         else:
             st.session_state.chat.append(
-                ("bot", "I’m not completely sure about that. Could you please rephrase your question?")
+                ("bot", "Could you please clarify your question? I want to assist you accurately.")
             )
 
     st.experimental_rerun()
